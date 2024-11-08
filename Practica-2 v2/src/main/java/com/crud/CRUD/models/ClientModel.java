@@ -12,48 +12,81 @@ import jakarta.persistence.Table;
 public class ClientModel {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_cliente;
 
-    @Column
+    @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Column
+    @Column(name = "apellido_paterno", length = 100)
+    private String apellidoPaterno;
+
+    @Column(name = "apellido_materno", length = 100)
+    private String apellidoMaterno;
+
+    @Column(nullable = false, unique = true, length = 100)
     private String correo;
 
-    @Column(name = "contrasena")
+    @Column(nullable = false, length = 255)
     private String contrasena;
 
-    public Long getId(){
+    @Column(columnDefinition = "TINYINT UNSIGNED DEFAULT 1")
+    private Integer rol;
+
+    // Getters y Setters
+    public Long getId() {
         return id_cliente;
     }
 
-    public void setId(Long id){
+    public void setId(Long id) {
         this.id_cliente = id;
     }
-    
-    public String getNombre(){
+
+    public String getNombre() {
         return nombre;
     }
 
-    public void setNombre(String nombre){
+    public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
-    public String getCorreo(){
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
+    }
+
+    public void setApellidoPaterno(String apellidoPaterno) {
+        this.apellidoPaterno = apellidoPaterno;
+    }
+
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
+    }
+
+    public void setApellidoMaterno(String apellidoMaterno) {
+        this.apellidoMaterno = apellidoMaterno;
+    }
+
+    public String getCorreo() {
         return correo;
     }
 
-    public void setCorreo(String correo){
+    public void setCorreo(String correo) {
         this.correo = correo;
     }
-    
-    public String getContrasena(){
+
+    public String getContrasena() {
         return contrasena;
     }
 
-    public void setContrasena(String contrasena){
+    public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
     }
 
+    public Integer getRol() {
+        return rol;
+    }
+
+    public void setRol(Integer rol) {
+        this.rol = rol;
+    }
 }

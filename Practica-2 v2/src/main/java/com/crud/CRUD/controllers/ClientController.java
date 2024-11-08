@@ -1,8 +1,8 @@
 package com.crud.CRUD.controllers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map; // Asegúrate de que esta sea la única importación de Map
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.crud.CRUD.models.ClientModel;
 import com.crud.CRUD.services.ClientServices;
 
-
-
 @RestController
 @RequestMapping("/cliente")
 public class ClientController {
     
     @Autowired
     private ClientServices userService;
-
-    @GetMapping("/getUsers")
-    public ArrayList<ClientModel> getUsers(){
-        return this.userService.getUsers();
-    }
 
     @PostMapping("/saveUser")
     public ClientModel saveUser(@RequestBody ClientModel user){
@@ -64,12 +57,31 @@ public class ClientController {
         if (user.isPresent()) {
             response.put("success", true);
             response.put("message", "Login exitoso");
-            // Opcional: puedes incluir un token simple o identificador de sesión
-            response.put("userId", user.get().getId()); // o cualquier identificador único
+            response.put("userId", user.get().getId());
+            response.put("rol", user.get().getRol()); // Enviar el rol al frontend
         } else {
             response.put("success", false);
             response.put("message", "Correo o contraseña incorrectos");
         }
         return response;
+    }
+
+    // Nuevo endpoint para obtener los datos del usuario autenticado
+    @GetMapping("/getUserData/{id}")
+    public Optional<ClientModel> getUserData(@PathVariable Long id) {
+        return userService.getById(id);
+    }
+
+    // Nuevo endpoint para obtener todos los usuarios (solo para el administrador)
+    @GetMapping("/getAllUsers")
+    public List<ClientModel> getAllUsers() {
+        return userService.getUsers();
+    }
+
+
+    // Endpoint de prueba para obtener información de un usuario por su id
+    @GetMapping("/public/getUserData/{id}")
+    public Optional<ClientModel> getUserDataPublic(@PathVariable Long id) {
+        return userService.getById(id);
     }
 }

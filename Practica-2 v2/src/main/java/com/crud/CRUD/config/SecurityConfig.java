@@ -14,12 +14,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // Deshabilita CSRF para pruebas (habilitar en producción)
+        http
+            .csrf(csrf -> csrf.disable()) // Deshabilita CSRF para pruebas (habilitar en producción)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/cliente/saveUser", "/cliente/login").permitAll() // Permitir acceso sin autenticación a estos endpoints
-                .anyRequest().authenticated() // Requerir autenticación para todos los demás endpoints
-            );
-        
+                .requestMatchers("/**").permitAll() // Permitir acceso sin autenticación a todos los endpoints
+            )
+            .cors(cors -> cors.disable()) // Desactiva CORS para pruebas (habilitar según sea necesario)
+            .httpBasic(httpBasic -> httpBasic.disable()); // Desactiva la autenticación básica para acceso libre
+
         return http.build();
     }
 

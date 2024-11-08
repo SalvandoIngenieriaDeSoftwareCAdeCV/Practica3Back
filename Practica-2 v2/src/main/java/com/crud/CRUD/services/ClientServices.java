@@ -1,6 +1,6 @@
 package com.crud.CRUD.services;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +19,11 @@ public class ClientServices {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ArrayList<ClientModel> getUsers(){
-        return (ArrayList<ClientModel>) userRepository.findAll();
+    public List<ClientModel> getUsers() {
+        return userRepository.findAll();
     }
 
-    public ClientModel saveUser(ClientModel user){
+    public ClientModel saveUser(ClientModel user) {
         // Establecer rol predeterminado si no se especifica
         if (user.getRol() == null) {
             user.setRol(1);
@@ -33,11 +33,11 @@ public class ClientServices {
         return userRepository.save(user);
     }
 
-    public Optional<ClientModel> getById(Long id){
+    public Optional<ClientModel> getById(Long id) {
         return userRepository.findById(id);
     }
 
-    public ClientModel updateById(ClientModel request, Long id){
+    public ClientModel updateById(ClientModel request, Long id) {
         ClientModel user = userRepository.findById(id).orElse(null);
         if (user != null) {
             user.setNombre(request.getNombre());
@@ -49,7 +49,7 @@ public class ClientServices {
         return user;
     }
 
-    public Boolean deleteUserById(Long id){
+    public Boolean deleteUserById(Long id) {
         try {
             userRepository.deleteById(id);
             return true;

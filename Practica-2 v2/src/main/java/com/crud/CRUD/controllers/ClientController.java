@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,20 +37,24 @@ public class ClientController {
         return this.userService.getById(id); 
     }
 
-    @PutMapping("/updateUser/{id}")
-    public ClientModel updateUserById(@RequestBody ClientModel request, @PathVariable Long id){
-        return this.userService.updateById(request, id);
+    @PutMapping("/updateUserByEmail")
+    public ClientModel updateUserByEmail(@RequestBody ClientModel request) {
+        return this.userService.updateByEmail(request);
     }
 
-    @DeleteMapping("/deleteUser/{id}")
-    public String deleteUserById(@PathVariable("id") Long id){
-        boolean ok = this.userService.deleteUserById(id);
-        if(ok){
-            return "Usuario eliminado correctamente";
-        }else{
-            return "El usuario no pudo ser eliminado";
+    @DeleteMapping("/deleteUserByEmail")
+    public ResponseEntity<?> deleteUserByEmail(@RequestBody Map<String, String> payload) {
+        String correo = payload.get("correo");
+        Optional<ClientModel> user = userService.findByEmail(correo);
+
+        if (user.isPresent()) {
+            userService.deleteUserByEmail(correo);
+            return ResponseEntity.ok().body("Usuario eliminado exitosamente");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
         }
     }
+
 
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody ClientModel request) {

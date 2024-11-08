@@ -58,11 +58,51 @@ public class ClientServices {
         }
     }
 
+    // Nuevo método para encontrar usuario por correo
+    public Optional<ClientModel> findByEmail(String correo) {
+        return userRepository.findByCorreo(correo);
+    }
+
+    // Método para eliminar usuario por correo
+    public Boolean deleteUserByEmail(String correo) {
+        Optional<ClientModel> user = findByEmail(correo);
+        if (user.isPresent()) {
+            try {
+                userRepository.delete(user.get());
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
     public Optional<ClientModel> findByEmailAndPassword(String correo, String contrasena) {
         Optional<ClientModel> user = userRepository.findByCorreo(correo);
         if (user.isPresent() && passwordEncoder.matches(contrasena, user.get().getContrasena())) {
             return user;
         }
         return Optional.empty();
-    }    
+    }
+
+    // Método para actualizar usuario por correo
+    public ClientModel updateByEmail(ClientModel request) {
+        Optional<ClientModel> existingUser = findByEmail(request.getCorreo());
+        
+        if (existingUser.isPresent()) {
+            ClientModel userToUpdate = existingUser.get();
+            
+            // Actualiza los campos del usuario
+            userToUpdate.setNombre(request.getNombre());
+            userToUpdate.setApellidoPaterno(request.getApellidoPaterno());
+            userToUpdate.setApellidoMaterno(request.getApellidoMaterno());
+            userToUpdate.setContrasena(passwordEncoder.encode(request.getContrasena())); // Encriptar la nueva contraseña
+            userToUpdate.setRol(request.getRol());
+
+            // Guarda los cambios en la base de datos
+            return userRepository.save(userToUpdate);
+        } else {
+            throw new RuntimeException("Usuario no encontrado con el correo: " + request.getCorreo());
+        }
+    }
 }

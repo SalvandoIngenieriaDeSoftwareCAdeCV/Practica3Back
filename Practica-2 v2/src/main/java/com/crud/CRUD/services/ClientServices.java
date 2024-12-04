@@ -37,6 +37,10 @@ public class ClientServices {
         return userRepository.findById(id);
     }
 
+    public Optional<ClientModel> getByEmail(String correo) {
+        return userRepository.findByCorreo(correo);
+    }
+
     public ClientModel updateById(ClientModel request, Long id) {
         ClientModel user = userRepository.findById(id).orElse(null);
         if (user != null) {
@@ -86,7 +90,7 @@ public class ClientServices {
     }
 
     // Método para actualizar usuario por correo
-    public ClientModel updateByEmail(ClientModel request) {
+    public ClientModel updateByEmail(ClientModel request, int modo, String ncorreo, int mod) {
         Optional<ClientModel> existingUser = findByEmail(request.getCorreo());
         
         if (existingUser.isPresent()) {
@@ -96,8 +100,19 @@ public class ClientServices {
             userToUpdate.setNombre(request.getNombre());
             userToUpdate.setApellidoPaterno(request.getApellidoPaterno());
             userToUpdate.setApellidoMaterno(request.getApellidoMaterno());
-            userToUpdate.setContrasena(passwordEncoder.encode(request.getContrasena())); // Encriptar la nueva contraseña
+            if(modo == 1){
+                if(mod == 1){
+                    userToUpdate.setContrasena(passwordEncoder.encode(request.getContrasena()));
+                }else{
+                    userToUpdate.setContrasena(request.getContrasena());
+                }
+                 // Encriptar la nueva contraseña
+                userToUpdate.setCorreo(ncorreo);
+            }else{
+                userToUpdate.setContrasena(request.getContrasena());
+            }
             userToUpdate.setRol(request.getRol());
+            userToUpdate.setImagen(request.getImagen());
 
             // Guarda los cambios en la base de datos
             return userRepository.save(userToUpdate);

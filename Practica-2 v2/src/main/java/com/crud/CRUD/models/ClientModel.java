@@ -33,6 +33,9 @@ public class ClientModel {
     @Column(columnDefinition = "TINYINT UNSIGNED DEFAULT 1")
     private Integer rol;
 
+    @Column(nullable = true)
+    private byte[] imagen;
+
     // Getters y Setters
     public Long getId() {
         return id_cliente;
@@ -88,5 +91,13 @@ public class ClientModel {
 
     public void setRol(Integer rol) {
         this.rol = rol;
+    }
+
+    public byte[] getImagen(){
+        return imagen;
+    }
+
+    public void setImagen(byte[] imagen){
+        this.imagen = imagen;
     }
 }

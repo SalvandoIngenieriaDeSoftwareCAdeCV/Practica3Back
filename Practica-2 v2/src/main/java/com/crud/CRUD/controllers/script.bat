@@ -1,0 +1,1 @@
+octave --eval "compress_image('input.jpeg', 75)"

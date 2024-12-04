@@ -1,5 +1,7 @@
 package com.crud.CRUD.controllers;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +16,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.crud.CRUD.models.ClientModel;
 import com.crud.CRUD.services.ClientServices;
@@ -28,18 +33,87 @@ public class ClientController {
     private ClientServices userService;
 
     @PostMapping("/saveUser")
-    public ClientModel saveUser(@RequestBody ClientModel user){
+    public ClientModel saveuser(
+        @RequestParam("nombre") String nombre,
+        @RequestParam("apellidoPaterno") String apellidoPaterno,
+        @RequestParam("apellidoMaterno") String apellidoMaterno,
+        @RequestParam("correo") String correo,
+        @RequestParam("contrasena") String contrasena,
+        @RequestParam(value = "imagen", required = false) MultipartFile imagen
+    ){
+        ClientModel user = new ClientModel();
+        try{
+            if(imagen != null){
+                byte[] imageBytes = imagen.getBytes();
+                byte[] nimagen;
+                imageBytes = ImageCompressor.compressImage(imageBytes, 75);
+                nimagen = Arrays.copyOf(imageBytes, imageBytes.length);
+                user.setImagen(nimagen);
+            }
+            user.setNombre(nombre);
+            user.setApellidoPaterno(apellidoPaterno);
+            user.setApellidoMaterno(apellidoMaterno);
+            user.setCorreo(correo);
+            user.setContrasena(contrasena);
+            
+        }catch (IOException e){
+            e.printStackTrace();
+        }
         return this.userService.saveUser(user);
     }
 
     @GetMapping("/getUser/{id}")
     public Optional<ClientModel> getUserById(@PathVariable Long id){
-        return this.userService.getById(id); 
+        Optional<ClientModel> temp = this.userService.getById(id);
+        return temp;
     }
 
+    @GetMapping("/getUser/{correo}")
+    public Optional<ClientModel> getUserByEmail(@PathVariable String correo) {
+        Optional<ClientModel> temp = this.userService.getByEmail(correo);
+        return temp;
+    }
+    
+
     @PutMapping("/updateUserByEmail")
-    public ClientModel updateUserByEmail(@RequestBody ClientModel request) {
-        return this.userService.updateByEmail(request);
+    public ClientModel updateUserByEmail(
+        @RequestParam("correo") String correo,
+        @RequestParam(value = "imagen", required = false) MultipartFile imagen,
+        @RequestParam(value = "nombre", required = false) String nombre,
+        @RequestParam(value = "apellidoPaterno", required = false) String apellidoPaterno,
+        @RequestParam(value = "apellidoMaterno", required = false) String apellidoMaterno,
+        @RequestParam(value = "contrasena", required = false) String contrasena,
+        @RequestParam(value = "correon", required = false) String correon,
+        @RequestParam(value = "rol", required = false) Integer rol,
+        @RequestHeader("modo") int modo,
+        @RequestHeader("mod") int mod
+    ) {
+        ClientModel user = new ClientModel();
+        try{
+            Optional<ClientModel> temp = this.userService.findByEmail(correo);
+            user = temp.get();
+            if(imagen != null){
+                byte[] imageBytes = imagen.getBytes();
+                byte[] nimagen;
+                imageBytes = ImageCompressor.compressImage(imageBytes, 75);
+                nimagen = Arrays.copyOf(imageBytes, imageBytes.length);
+                user.setImagen(nimagen);
+            }
+            if(nombre != null)
+            user.setNombre(nombre);
+            if(apellidoPaterno != null)
+            user.setApellidoPaterno(apellidoPaterno);
+            if(apellidoMaterno != null)
+            user.setApellidoMaterno(apellidoMaterno);
+            if(contrasena != null)
+            user.setContrasena(contrasena);
+            if(rol != null)
+                user.setRol(rol);
+            user.setCorreo(correo);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return this.userService.updateByEmail(user, modo, correon, mod);
     }
 
     @DeleteMapping("/deleteUserByEmail")
